@@ -1,7 +1,5 @@
 class Cubes {
     constructor() {
-
-
         this.matrix = new Matrix4()
     }
 
@@ -38,7 +36,7 @@ class Cubes {
         draw_traingle_3d([0.0,1.0,0.0, 1.0,1.0,0.0, 0.0,1.0,1.0])
         draw_traingle_3d([1.0,1.0,0.0, 1.0,1.0,1.0, 0.0,1.0,1.0])
 
-        gl.uniform4f(u_FragColor, rgba[0] * 0.5, rgba[1] * 0.5, rgba[2] * 0.5, rgba[3]);
+        gl.uniform4f(u_FragColor, rgba[0] * 0.9, rgba[1] * 0.9, rgba[2] * 0.9, rgba[3]);
         
         draw_traingle_3d([0.0,0.0,0.0, 1.0,0.0,0.0, 1.0,0.0,1.0])
         draw_traingle_3d([0.0,0.0,0.0, 0.0,0.0,1.0, 1.0,0.0,1.0])
