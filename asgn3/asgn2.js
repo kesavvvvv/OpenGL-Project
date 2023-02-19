@@ -591,30 +591,53 @@ document.onkeydown = (e) => {
         camera_eye.sub(right)
         camera_at.sub(right)
     }
-    if (e.key == 'q') {
-        d.elements[0] = camera_at.elements[0]
-        d.elements[1] = camera_at.elements[1]
-        d.elements[2] = camera_at.elements[2]
-        d.sub(camera_eye)
-        // d.normalize()
+    if (e.key == 'ArrowLeft') {
+        var pl = new Vector3;
+        pl.set(camera_at);
+        pl.sub(camera_eye);
+        let rotationMatrix = new Matrix4();
+		rotationMatrix.setIdentity();
+		rotationMatrix.setRotate(1 * 1, camera_up.elements[0], camera_up.elements[1], camera_up.elements[2]);
+		// Get the vec3 translation of Matrix4 Rotation Matrix
+		let d3D = rotationMatrix.multiplyVector3(pl);
+		camera_at = d3D.add(camera_eye);
 
-        var r = Math.sqrt(d.elements[0]^2 + d.elements[1]^2)
-        var the = Math.atan(d.elements[1], d.elements[0])
+    }
+    if (e.key == 'ArrowRight') {
+        var pl = new Vector3;
+        pl.set(camera_at);
+        pl.sub(camera_eye);
+        let rotationMatrix = new Matrix4();
+		rotationMatrix.setIdentity();
+		rotationMatrix.setRotate(-1 * 1, camera_up.elements[0], camera_up.elements[1], camera_up.elements[2]);
+		// Get the vec3 translation of Matrix4 Rotation Matrix
+		let d3D = rotationMatrix.multiplyVector3(pl);
+		camera_at = d3D.add(camera_eye);
 
-        console.log(r, the)
+    }
 
-        the += toRadians(5)
+    if(e.key == 'ArrowUp') {
+        var pl = new Vector3;
+        var nv = new Vector3([0,0.5,0]);
+        pl.set(camera_at);
+        pl.add(nv);
+        pl.sub(camera_eye);
+        let rotationMatrix = new Matrix4();
+		rotationMatrix.setIdentity();
+		let d3D = rotationMatrix.multiplyVector3(pl);
+		camera_at = d3D.add(camera_eye);
+    }
 
-        console.log(the)
-
-        d.elements[0] = r * Math.cos(the)
-        d.elements[0] = r * Math.sin(the)
-        
-        
-
-        // camera_eye.add(d)
-        camera_at.add(d)
-
+    if(e.key == 'ArrowDown') {
+        var pl = new Vector3;
+        var nv = new Vector3( [0,0.5,0] );
+        pl.set(camera_at);
+        pl.sub(nv);
+        pl.sub(camera_eye);
+        let rotationMatrix = new Matrix4();
+		rotationMatrix.setIdentity();
+		let d3D = rotationMatrix.multiplyVector3(pl);
+		camera_at = d3D.add(camera_eye);
     }
 }
 
