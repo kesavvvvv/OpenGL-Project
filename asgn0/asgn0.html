@@ -3,20 +3,46 @@
 
 <head>
     <meta charset="utf-8" />
-    <title>Draw a blue rectangle (canvas version)</title>
+    <title>Assignment 0 keravich</title>
     <style>
         .test {
-            width: 250px;
+            width: 300px;
             margin: auto;
             /* clear: both; */
         }
 
         .test input {
-            width: 45%;
+            width: 35%;
+            display: inline;
+        }
+        .test p {
+            width: 30%;
             display: inline;
         }
 
-        .test select {
+        .test2 {
+            width: 300px;
+            margin: auto;
+            /* clear: both; */
+        }
+
+        
+        .test2 input {
+            width: 45%;
+            display: inline;
+        }
+        .test3 {
+            width: 100px;
+            margin: auto;
+            /* clear: both; */
+        }
+
+        .test3 input {
+            width: 100%;
+            display: inline;
+        }
+
+        .test2 select {
             width: 45%;
             display: inline;
         }
@@ -38,20 +64,24 @@
 </head>
 
 <body onload="main()">
-
     <canvas id="example" width="400" height="400">
         Please use a browser that supports "canvas"
     </canvas>
     <div class="test">
-        <input style="float: left;" type='text' id='xv1' name='xv1' required>
-        <input style="float: right;" type='text' id='yv1' name='yv1' required>
-        <p>
-            <input style="float: left;" type='text' id='xv2' name='xv2' required>
-            <input style="float: right;" type='text' id='yv2' name='yv2' required>
-        <p>
-        <div style="margin: auto;">
-            <input type='button' id='draw' value='Draw' name='draw' required>
-        </div>
+        <p>X1</p>
+        <input type='text' id='xv1' name='xv1' required>
+        <p>Y1</p>
+        <input type='text' id='yv1' name='yv1' required>
+        <p>X2</p>
+        <input type='text' id='xv2' name='xv2' required>
+        <p>Y2</p>
+        <input type='text' id='yv2' name='yv2' required>
+        
+    </div>
+    <div class="test3">
+        <input type='button' id='draw' value='Draw' name='draw' required>
+    </div>
+    <div class="test2">
         <select name="options" id="options">
             <option value="">--Please choose an option--</option>
             <option value="add">Add</option>
@@ -63,12 +93,11 @@
             <option value="ang">Angle Between</option>
             <option value="area">Area</option>
         </select>
-        <input style="float: right;" type='text' id='scalar' name='scalar' required>
-
-        <input type='button' id='draw2' value='Draw' name='draw' required>
-
+        <input type='text' id='scalar' name='scalar' required>
     </div>
-
+    <div class="test3">
+        <input type='button' id='draw2' value='Draw' name='draw' required>
+    </div>
     <script src="lib/cuon-matrix-cse160.js"></script>
     <script src="asgn0.js"></script>
 </body>

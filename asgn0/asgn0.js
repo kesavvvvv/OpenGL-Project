@@ -1,15 +1,21 @@
 // DrawRectangle.js
 
+// Init canvas
 var canvas = document.getElementById('example');
+var ctx = canvas.getContext('2d');
+
+// Initialze HTML buttons
 const button = document.getElementById('draw');
 const button2 = document.getElementById('draw2');
 const select = document.getElementById('options')
-var ctx = canvas.getContext('2d');
+
+
+// Initialze the vectors
 var v1 = new Vector3(2.25, 2.25, 0);
 var v2 = new Vector3(2.25, 2.25, 0);
 var v3 = new Vector3();
 
-button.onclick = () => {
+draw_vectors = () => {
     ctx.fillStyle = 'rgb(128,128,128)';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     v1.elements[0] = document.getElementById('xv1').value
@@ -20,84 +26,90 @@ button.onclick = () => {
     drawVector(v1, "red");
     drawVector(v2, "blue");
 
-    // v3 = v1
-
     v3.elements[0] = v1.elements[0]
     v3.elements[1] = v1.elements[1]
-
+}
+button.onclick = () => {
+    
+    draw_vectors()
 
 }
 
 button2.onclick = () => {
     switch (select.value) {
         case "add":
+            draw_vectors()
             v3.elements[0] = v1.elements[0]
             v3.elements[1] = v1.elements[1]
             v3.add(v2)
 
-            console.log(v3)
-            console.log(v1)
+            // console.log(v3)
+            // console.log(v1)
 
             drawVector(v3, "green")
             break;
 
         case "sub":
+            draw_vectors()
             v3.elements[0] = v1.elements[0]
             v3.elements[1] = v1.elements[1]
             v3.sub(v2)
 
-            console.log(v3)
-            console.log(v1)
+            // console.log(v3)
+            // console.log(v1)
 
             drawVector(v3, "green")
             break;
         case "mul":
+            draw_vectors()
             v3.elements[0] = v1.elements[0]
             v3.elements[1] = v1.elements[1]
-            console.log(document.getElementById("scalar").value)
+            // console.log(document.getElementById("scalar").value)
             v3.mul(Number(document.getElementById("scalar").value));
 
-            console.log(v3)
-            console.log(v1)
+            // console.log(v3)
+            // console.log(v1)
 
             drawVector(v3, "green")
             v3.elements[0] = v2.elements[0]
             v3.elements[1] = v2.elements[1]
-            console.log(document.getElementById("scalar").value)
+            // console.log(document.getElementById("scalar").value)
             v3.mul(Number(document.getElementById("scalar").value));
 
-            console.log(v3)
-            console.log(v1)
+            // console.log(v3)
+            // console.log(v1)
 
             drawVector(v3, "green")
             break;
         case "div":
+            draw_vectors()
             v3.elements[0] = v1.elements[0]
             v3.elements[1] = v1.elements[1]
-            console.log(document.getElementById("scalar").value)
+            // console.log(document.getElementById("scalar").value)
             v3.div(Number(document.getElementById("scalar").value));
 
-            console.log(v3)
-            console.log(v1)
+            // console.log(v3)
+            // console.log(v1)
 
             drawVector(v3, "green")
 
             v3.elements[0] = v2.elements[0]
             v3.elements[1] = v2.elements[1]
-            console.log(document.getElementById("scalar").value)
+            // console.log(document.getElementById("scalar").value)
             v3.div(Number(document.getElementById("scalar").value));
 
-            console.log(v3)
-            console.log(v1)
+            // console.log(v3)
+            // console.log(v1)
 
             drawVector(v3, "green")
             break;
 
         case "mag":
-
+            draw_vectors()
             v3.elements[0] = v1.elements[0]
             v3.elements[1] = v1.elements[1]
             // console.log(document.getElementById("scalar").value)
+            console.log("Magnitude of V1 is: ")
             console.log(v3.magnitude())
 
             // console.log(v3)
@@ -108,40 +120,46 @@ button2.onclick = () => {
             v3.elements[0] = v2.elements[0]
             v3.elements[1] = v2.elements[1]
             // console.log(document.getElementById("scalar").value)
+            console.log("Magnitude of V2 is: ")
             console.log(v3.magnitude())
 
             break;
 
         case "nor":
+            draw_vectors()
             v3.elements[0] = v1.elements[0]
             v3.elements[1] = v1.elements[1]
             // console.log(document.getElementById("scalar").value)
             v3.normalize();
 
-            console.log(v3)
-            console.log(v1)
+            // console.log(v3)
+            // console.log(v1)
 
             drawVector(v3, "green")
 
             v3.elements[0] = v2.elements[0]
             v3.elements[1] = v2.elements[1]
-            console.log(document.getElementById("scalar").value)
+            // console.log(document.getElementById("scalar").value)
             v3.normalize();
 
-            console.log(v3)
-            console.log(v1)
+            // console.log(v3)
+            // console.log(v1)
 
             drawVector(v3, "green")
             break;
 
         case "ang":
+            draw_vectors()
             v3.elements[0] = v1.elements[0]
             v3.elements[1] = v1.elements[1]
             // console.log(Math.acos(Vector3.dot(v1, v2)) * 180 / Math.PI)
             // console.log(document.getElementById("scalar").value)
+            console.log("Angle between the two vectors is: ")
             console.log(Math.acos(Vector3.dot(v1, v2) / (v1.magnitude() * v2.magnitude())) * 180 / Math.PI);
             break;
         case "area":
+            draw_vectors()
+            console.log("Area of the two vectors: ")
             console.log(Vector3.cross(v1, v2).magnitude() / 2)
             break;
         default:
@@ -151,9 +169,6 @@ button2.onclick = () => {
 }
 
 function main() {
-    // Retrieve <canvas> element <- (1)
-
-
 
     if (!canvas) {
         console.log('Failed to retrieve the <canvas> element');

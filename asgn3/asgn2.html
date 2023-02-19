@@ -3,17 +3,17 @@
 
 <head>
     <meta charset="utf-8" />
-    <title>Assignment 1 keravich</title>
-    <style>
+    <title>Assignment 2 keravich</title>
+     <style>
         .test {
-            width: 150px;
+            width: 100%;
             margin: auto;
             /* clear: both; */
             margin-bottom: 15px;
         }
 
         .test input {
-            width: 100%;
+            width: 5%;
             display: inline;
         }
 
@@ -57,51 +57,76 @@
 
         input {
             margin-bottom: 5px;
-        }
+        } 
 
-        /* select {
+         /* select {
             margin-bottom: 5px;
         } */
 
-        canvas {
+        /* canvas {
             left: calc(50%);
             margin-left: calc(50% - 200px);
             margin-bottom: 15px;
+        } */ 
+
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+        }
+        canvas {
+            background-color: #ccc;
+             /* display: block; */
+            /* position: absolute;  */
+            top: 0;
+            left: 0;
+            right: 0;
+            /* bottom: 0;  */
+            width: 100%;
+            height: 97.5%;
         }
     </style>
 </head>
 
 <body onload="main()">
+    
     <canvas id="example" width="400" height="400">
         Please use a browser that supports "canvas"
     </canvas>
+    
     <div class="test">
-        
-        <input type='button' id='clear' value='Clear' name='clear' required>
-        <input type='button' id='triangle' value='Triangle' name='tri' required>
-        <input type='button' id='square' value='Square' name='sq' required>
+        Camera Angle: <input type="range" min="-180" max="180" value="60" class="slider" id="camera_angle">
+        Hand Angle: <input type="range" min="0" max="120" value="60" class="slider" id="hand">
+        Sword Angle: <input type="range" min="0" max="90" value="90" class="slider" id="sword">
+        <!-- <input type='button' id='clear' value='Clear' name='clear' required> -->
+        <input type='button' id='animate' value='Animation' name='animate' required>
+        <!-- <input type='button' id='square' value='Square' name='sq' required>
         <input type='button' id='circle' value='Circle' name='cir' required>
-        <input type='button' id='draw' value='Drawing' name='draw' required>
+        <input type='button' id='draw' value='Drawing' name='draw' required> -->
+        FPS: <label id = "fps"></label>
     </div>
-    <div class="test1">
+    <!-- <div class="test1">
         <p>Red</p>
-        <input type="range" min="0" max="10" value="0" class="slider" id="red">
+        <input type="range" min="-60" max="60" value="0" class="slider" id="red">
         <p>Green</p>
         <input type="range" min="0" max="10" value="10" class="slider" id="green">
         <p>Blue</p>
-        <input type="range" min="0" max="10" value="10" class="slider" id="blue">
+        <input type="range" min="-60" max="60" value="-40" class="slider" id="blue">
     </div>
     <div class="test2">
-        <p>Size</p>
-        <input type="range" min="0" max="100" value="20" class="slider" id="size">
-        <p>Segment</p>
-        <input type="range" min="1" max="20" value="15" class="slider" id="segment">
-    </div>
+        <p>right arm</p>
+        <input type="range" min="-90" max="90" value="0" class="slider" id="size">
+        <p>Camera Angle</p>
+        <input type="range" min="-180" max="180" value="0" class="slider" id="camera_angle">
+    </div> -->
+    <script src="lib/vector3.js"></script>
     <script src="lib/cuon-matrix.js"></script>
     <script src="lib/cuon-utils.js"></script>
     <script src="lib/webgl-debug.js"></script>
     <script src="lib/webgl-utils.js"></script>
-    <script src="asgn1.js"></script>
+    <script src="cubes.js"></script>
+    <script src="asgn2.js"></script>
 </body>
 
 </html>
