@@ -22,7 +22,7 @@ var FSHADER_SOURCE = `
     varying vec2 v_UV;
     uniform vec4 u_FragColor;
     uniform sampler2D u_Sampler0;
-    // uniform sampler2D u_Sampler1;
+    uniform sampler2D u_Sampler1;
 
     uniform int u_which_texture;
     void main() {
@@ -37,10 +37,10 @@ var FSHADER_SOURCE = `
             vec4 color0 = texture2D(u_Sampler0, v_UV);
             gl_FragColor = color0;
         } 
-        // else if (u_which_texture == 1) {
-        //     vec4 color1 = texture2D(u_Sampler1, v_UV);
-        //     gl_FragColor = color;
-        // } 
+        else if (u_which_texture == 1) {
+            vec4 color1 = texture2D(u_Sampler1, v_UV);
+            gl_FragColor = color1;
+        } 
         else {
             gl_FragColor = vec4(1, 0.2, 0.2, 1);
         }
@@ -76,30 +76,31 @@ function initTextures(gl, n) {
 
     // Get the storage location of u_Sampler0 and u_Sampler1
     var u_Sampler0 = gl.getUniformLocation(gl.program, 'u_Sampler0');
-    // var u_Sampler1 = gl.getUniformLocation(gl.program, 'u_Sampler1');
-    // if (!u_Sampler0 || !u_Sampler1) {
-    //     console.log('Failed to get the storage location of u_Sampler');
-    //     return false;
-    // }
+    var u_Sampler1 = gl.getUniformLocation(gl.program, 'u_Sampler1');
+    
 
     if (!u_Sampler0) {
-        console.log('Failed to get the storage location of u_Sampler');
+        console.log('Failed to get the storage location of u_Sampler0');
+        return false;
+    }
+
+    if (!u_Sampler1) {
+        console.log('Failed to get the storage location of u_Sampler1');
         return false;
     }
 
     // Create the image object
     var image0 = new Image();
     var image1 = new Image();
-    if (!image0 || !image1) {
-        console.log('Failed to create the image object');
-        return false;
-    }
+    
     // Register the event handler to be called when image loading is completed
     image0.onload = function () { loadTexture(gl, n, texture0, u_Sampler0, image0, 0); };
-    // image1.onload = function () { loadTexture(gl, n, texture1, u_Sampler1, image1, 1); };
+    
+    image1.onload = function () { loadTexture(gl, n, texture1, u_Sampler1, image1, 1); };
+
     // Tell the browser to load an Image
-    image0.src = 'resources/end3.png';
-    // image1.src = 'resources/circle.gif';
+    image0.src = 'resources/nether.png';
+    image1.src = 'resources/lava.png';
 
     return true;
 }
@@ -111,10 +112,8 @@ function loadTexture(gl, n, texture, u_Sampler, image, texUnit) {
     // Make the texture unit active
     if (texUnit == 0) {
         gl.activeTexture(gl.TEXTURE0);
-        g_texUnit0 = true;
     } else {
         gl.activeTexture(gl.TEXTURE1);
-        g_texUnit1 = true;
     }
     // Bind the texture object to the target
     gl.bindTexture(gl.TEXTURE_2D, texture);
@@ -618,7 +617,7 @@ document.onkeydown = (e) => {
 
     if(e.key == 'ArrowUp') {
         var pl = new Vector3;
-        var nv = new Vector3([0,0.5,0]);
+        var nv = new Vector3([0,1,0]);
         pl.set(camera_at);
         pl.add(nv);
         pl.sub(camera_eye);
@@ -630,7 +629,7 @@ document.onkeydown = (e) => {
 
     if(e.key == 'ArrowDown') {
         var pl = new Vector3;
-        var nv = new Vector3( [0,0.5,0] );
+        var nv = new Vector3([0,1,0]);
         pl.set(camera_at);
         pl.sub(nv);
         pl.sub(camera_eye);
@@ -641,6 +640,29 @@ document.onkeydown = (e) => {
     }
 }
 
+map = [
+    [1, 1, 1, 1, 1, 1, 1, 1],
+    [1, 0, 0, 0, 0, 0, 0, 1],
+    [1, 0, 0, 0, 0, 0, 0, 1],
+    [1, 0, 0, 0, 0, 0, 0, 1],
+    [1, 0, 0, 0, 0, 0, 0, 1],
+    [1, 0, 0, 0, 0, 0, 0, 1],
+    [1, 0, 0, 0, 0, 0, 0, 1],
+    [1, 0, 0, 0, 0, 0, 0, 1]
+]
+
+draw_map = () => {
+    for(x=0;x<8;x++) {
+        for(y=0;y<8;y++) {
+            if(map[x][y]) {
+                var block = new Cubes()
+                block.color = [1,1,1,1]
+                block.matrix.translate(x-4, -0.75, y-4)
+                block.render()
+            }
+        }
+    }
+}
 
 render_scene = () => {
 
@@ -664,13 +686,24 @@ render_scene = () => {
     if (l % 10 == 0 && i > -0.21) {
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
         gl.clear(gl.COLOR_BUFFER_BIT)
+        
         var floor = new Cubes()
-    floor.color = [1,0,0,1]
-    floor.texture_num = 0;
-    floor.matrix.translate(0, -0.8, 0.0)
-    floor.matrix.scale(10, 0, 10)
-    floor.matrix.translate(-0.5, 0, -0.5)
-    floor.render()
+        floor.color = [1,0,0,1]
+        floor.texture_num = 0;
+        floor.matrix.translate(0, -0.8, 0.0)
+        floor.matrix.scale(10, 0, 10)
+        floor.matrix.translate(-0.5, 0, -0.5)
+        floor.render()
+
+        var sky = new Cubes()
+        sky.color = [1,0,0,1]
+        sky.texture_num = 1;
+        sky.matrix.scale(50, 50, 50)
+        sky.matrix.translate(-0.5, -0.5, -0.5)
+        sky.render()
+
+        draw_map()
+
         animate()
         // animate_pig()
         i -= 0.05
@@ -696,13 +729,24 @@ render_scene = () => {
         // }
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
         gl.clear(gl.COLOR_BUFFER_BIT)
+
         var floor = new Cubes()
-    floor.color = [1,0,0,1]
-    floor.texture_num = 0;
-    floor.matrix.translate(0, -0.8, 0.0)
-    floor.matrix.scale(10, 0, 10)
-    floor.matrix.translate(-0.5, 0, -0.5)
-    floor.render()
+        floor.color = [1,0,0,1]
+        floor.texture_num = 0;
+        floor.matrix.translate(0, -0.8, 0.0)
+        floor.matrix.scale(10, 0, 10)
+        floor.matrix.translate(-0.5, 0, -0.5)
+        floor.render()
+        
+        var sky = new Cubes()
+        sky.color = [1,0,0,1]
+        sky.texture_num = 1;
+        sky.matrix.scale(50, 50, 50)
+        sky.matrix.translate(-0.5, -0.5, -0.5)
+        sky.render()
+
+        draw_map()
+
         animate_killing()
         if (reverse == 0) {
             sword_angle_kill -= 20
@@ -748,6 +792,16 @@ render_scene = () => {
     floor.matrix.scale(10, 0, 10)
     floor.matrix.translate(-0.5, 0, -0.5)
     floor.render()
+
+    var sky = new Cubes()
+        sky.color = [1,0,0,1]
+        sky.texture_num = 1;
+        sky.matrix.scale(50, 50, 50)
+        sky.matrix.translate(-0.5, -0.5, -0.5)
+        sky.render()
+
+        draw_map()
+
         animate_pig_dead()
         // console.log(bomb_size)
         bomb_size += 0.5
@@ -804,6 +858,16 @@ render_scene = () => {
     floor.matrix.scale(10, 0, 10)
     floor.matrix.translate(-0.5, 0, -0.5)
     floor.render()
+
+    var sky = new Cubes()
+        sky.color = [1,0,0,1]
+        sky.texture_num = 1;
+        sky.matrix.scale(50, 50, 50)
+        sky.matrix.translate(-0.5, -0.5, -0.5)
+        sky.render()
+
+        draw_map()
+
             animate_steve_pork_chop_no_jump()
         }
         else {
@@ -816,6 +880,16 @@ render_scene = () => {
     floor.matrix.scale(10, 0, 10)
     floor.matrix.translate(-0.5, 0, -0.5)
     floor.render()
+
+    var sky = new Cubes()
+        sky.color = [1,0,0,1]
+        sky.texture_num = 1;
+        sky.matrix.scale(50, 50, 50)
+        sky.matrix.translate(-0.5, -0.5, -0.5)
+        sky.render()
+
+        draw_map()
+
             animate_steve_pork_chop()
         }
 
