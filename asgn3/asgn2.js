@@ -23,7 +23,8 @@ var FSHADER_SOURCE = `
     uniform vec4 u_FragColor;
     uniform sampler2D u_Sampler0;
     uniform sampler2D u_Sampler1;
-
+    uniform sampler2D u_Sampler2;
+    uniform sampler2D u_Sampler3;
     uniform int u_which_texture;
     void main() {
 
@@ -40,6 +41,14 @@ var FSHADER_SOURCE = `
         else if (u_which_texture == 1) {
             vec4 color1 = texture2D(u_Sampler1, v_UV);
             gl_FragColor = color1;
+        } 
+        else if (u_which_texture == 2) {
+            vec4 color2 = texture2D(u_Sampler2, v_UV);
+            gl_FragColor = color2;
+        } 
+        else if (u_which_texture == 3) {
+            vec4 color3 = texture2D(u_Sampler3, v_UV);
+            gl_FragColor = color3;
         } 
         else {
             gl_FragColor = vec4(1, 0.2, 0.2, 1);
@@ -69,38 +78,55 @@ function initTextures(gl, n) {
     // Create a texture object
     var texture0 = gl.createTexture();
     var texture1 = gl.createTexture();
-    if (!texture0 || !texture1) {
-        console.log('Failed to create the texture object');
-        return false;
-    }
+    var texture2 = gl.createTexture();
+    var texture3 = gl.createTexture();
 
     // Get the storage location of u_Sampler0 and u_Sampler1
     var u_Sampler0 = gl.getUniformLocation(gl.program, 'u_Sampler0');
-    var u_Sampler1 = gl.getUniformLocation(gl.program, 'u_Sampler1');
-    
 
     if (!u_Sampler0) {
         console.log('Failed to get the storage location of u_Sampler0');
         return false;
     }
 
+    var u_Sampler1 = gl.getUniformLocation(gl.program, 'u_Sampler1');
+
     if (!u_Sampler1) {
         console.log('Failed to get the storage location of u_Sampler1');
+        return false;
+    }
+
+    var u_Sampler2 = gl.getUniformLocation(gl.program, 'u_Sampler2');
+
+    if (!u_Sampler2) {
+        console.log('Failed to get the storage location of u_Sampler2');
+        return false;
+    }
+
+    var u_Sampler3 = gl.getUniformLocation(gl.program, 'u_Sampler3');
+
+    if (!u_Sampler3) {
+        console.log('Failed to get the storage location of u_Sampler3');
         return false;
     }
 
     // Create the image object
     var image0 = new Image();
     var image1 = new Image();
+    var image2 = new Image();
+    var image3 = new Image();
     
     // Register the event handler to be called when image loading is completed
     image0.onload = function () { loadTexture(gl, n, texture0, u_Sampler0, image0, 0); };
-    
     image1.onload = function () { loadTexture(gl, n, texture1, u_Sampler1, image1, 1); };
-
+    image2.onload = function () { loadTexture(gl, n, texture2, u_Sampler2, image2, 2); };
+    image3.onload = function () { loadTexture(gl, n, texture3, u_Sampler3, image3, 3); };
     // Tell the browser to load an Image
     image0.src = 'resources/nether.png';
     image1.src = 'resources/lava.png';
+    image2.src = 'resources/quartz.png';
+    image3.src = 'resources/magma.png';
+    
 
     return true;
 }
@@ -112,9 +138,17 @@ function loadTexture(gl, n, texture, u_Sampler, image, texUnit) {
     // Make the texture unit active
     if (texUnit == 0) {
         gl.activeTexture(gl.TEXTURE0);
-    } else {
+    } 
+    else if (texUnit == 1) {
         gl.activeTexture(gl.TEXTURE1);
     }
+    else if (texUnit == 2) {
+        gl.activeTexture(gl.TEXTURE2);
+    }
+    else if (texUnit == 3) {
+        gl.activeTexture(gl.TEXTURE3);
+    }
+    
     // Bind the texture object to the target
     gl.bindTexture(gl.TEXTURE_2D, texture);
 
@@ -641,23 +675,33 @@ document.onkeydown = (e) => {
 }
 
 map = [
-    [1, 1, 1, 1, 1, 1, 1, 1],
-    [1, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 1]
+    [0, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 ]
 
 draw_map = () => {
-    for(x=0;x<8;x++) {
-        for(y=0;y<8;y++) {
+    for(x=0;x<16;x++) {
+        for(y=0;y<16;y++) {
             if(map[x][y]) {
                 var block = new Cubes()
                 block.color = [1,1,1,1]
-                block.matrix.translate(x-4, -0.75, y-4)
+                block.texture_num = 2;
+                block.matrix.scale(0.15,0.15,0.15)
+                block.matrix.translate(x-8, -4.75, y-8)
                 block.render()
             }
         }
@@ -691,7 +735,7 @@ render_scene = () => {
         floor.color = [1,0,0,1]
         floor.texture_num = 0;
         floor.matrix.translate(0, -0.8, 0.0)
-        floor.matrix.scale(10, 0, 10)
+        floor.matrix.scale(50, 0, 50)
         floor.matrix.translate(-0.5, 0, -0.5)
         floor.render()
 
@@ -734,7 +778,7 @@ render_scene = () => {
         floor.color = [1,0,0,1]
         floor.texture_num = 0;
         floor.matrix.translate(0, -0.8, 0.0)
-        floor.matrix.scale(10, 0, 10)
+        floor.matrix.scale(50, 0, 50)
         floor.matrix.translate(-0.5, 0, -0.5)
         floor.render()
         
@@ -789,7 +833,7 @@ render_scene = () => {
     floor.color = [1,0,0,1]
     floor.texture_num = 0;
     floor.matrix.translate(0, -0.8, 0.0)
-    floor.matrix.scale(10, 0, 10)
+    floor.matrix.scale(50, 0, 50)
     floor.matrix.translate(-0.5, 0, -0.5)
     floor.render()
 
@@ -855,7 +899,7 @@ render_scene = () => {
     floor.color = [1,0,0,1]
     floor.texture_num = 0;
     floor.matrix.translate(0, -0.8, 0.0)
-    floor.matrix.scale(10, 0, 10)
+    floor.matrix.scale(50, 0, 50)
     floor.matrix.translate(-0.5, 0, -0.5)
     floor.render()
 
@@ -877,7 +921,7 @@ render_scene = () => {
     floor.color = [1,0,0,1]
     floor.texture_num = 0;
     floor.matrix.translate(0, -0.8, 0.0)
-    floor.matrix.scale(10, 0, 10)
+    floor.matrix.scale(50, 0, 50)
     floor.matrix.translate(-0.5, 0, -0.5)
     floor.render()
 
