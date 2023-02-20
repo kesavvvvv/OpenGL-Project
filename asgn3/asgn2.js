@@ -172,31 +172,7 @@ function convertCoordinatesEventsToGL(ev) {
     return ([x, y]);
 }
 
-function startView(ev) {
-    let v = convertCoordinatesEventsToGL(ev)
-    var x = ev.clientX; // x coordinate of a mouse pointer
-    var y = ev.clientY; // y coordinate of a mouse pointer
-    var rect = ev.target.getBoundingClientRect();
 
-    x = ((x - rect.left) - canvas.width / 2) / (canvas.width / 2);
-    y = (canvas.height / 2 - (y - rect.top)) / (canvas.height / 2);
-    g_prevX = x;
-    g_prevY = y;
-}
-
-function changeView(ev) {
-    var x = ev.clientX; // x coordinate of a mouse pointer
-    var y = ev.clientY; // y coordinate of a mouse pointer
-    var rect = ev.target.getBoundingClientRect();
-
-    x = ((x - rect.left) - canvas.width / 2) / (canvas.width / 2);
-    y = (canvas.height / 2 - (y - rect.top)) / (canvas.height / 2);
-    g_globalX += x - g_prevX;
-    g_globalY -= y - g_prevY;
-
-    g_prevX = x;
-    g_prevY = y;
-}
 
 function setView() {
     var viewMat = new Matrix4()
@@ -555,11 +531,11 @@ var change_camera_angle = 1
 var camera_change_x = 1.15
 var camera_change_y = 0
 
-var camera_eye = new Vector3(0, 0, 3);
+var camera_eye = new Vector3(0, 0, 100);
 camera_eye.elements[0] = 0
-camera_eye.elements[1] = 0
+camera_eye.elements[1] = 0.5
 camera_eye.elements[2] = 3
-var camera_at = new Vector3(0, 0, -100)
+var camera_at = new Vector3(0, 0, -10)
 camera_at.elements[0] = 0
 camera_at.elements[1] = 0
 camera_at.elements[2] = -100
@@ -569,6 +545,73 @@ camera_up.elements[1] = 1
 camera_up.elements[2] = 0
 
 var d = new Vector3()
+
+function startView(ev) {
+    let v = convertCoordinatesEventsToGL(ev)
+    var x = ev.clientX; // x coordinate of a mouse pointer
+    var y = ev.clientY; // y coordinate of a mouse pointer
+    var rect = ev.target.getBoundingClientRect();
+
+    x = ((x - rect.left) - canvas.width / 2) / (canvas.width / 2);
+    y = (canvas.height / 2 - (y - rect.top)) / (canvas.height / 2);
+    g_prevX = x;
+    g_prevY = y;
+}
+
+function changeView(ev) {
+    var x = ev.clientX; // x coordinate of a mouse pointer
+    var y = ev.clientY; // y coordinate of a mouse pointer
+    var rect = ev.target.getBoundingClientRect();
+
+    x = ((x - rect.left) - canvas.width / 2) / (canvas.width / 2);
+    y = (canvas.height / 2 - (y - rect.top)) / (canvas.height / 2);
+    
+    if(x<g_prevX) {
+        var pl = new Vector3;
+        pl.set(camera_at);
+        pl.sub(camera_eye);
+        let rotationMatrix = new Matrix4();
+		rotationMatrix.setIdentity();
+		rotationMatrix.setRotate(1, camera_up.elements[0], camera_up.elements[1], camera_up.elements[2]);
+		let d = rotationMatrix.multiplyVector3(pl);
+		camera_at = d.add(camera_eye);
+    }
+    if(x>g_prevX) {
+        var pl = new Vector3;
+        pl.set(camera_at);
+        pl.sub(camera_eye);
+        let rotationMatrix = new Matrix4();
+		rotationMatrix.setIdentity();
+		rotationMatrix.setRotate(-1, camera_up.elements[0], camera_up.elements[1], camera_up.elements[2]);
+		let d = rotationMatrix.multiplyVector3(pl);
+		camera_at = d.add(camera_eye);
+    }
+    if(y>g_prevY) {
+        var pl = new Vector3;
+        var nv = new Vector3([0,1,0]);
+        pl.set(camera_at);
+        pl.add(nv);
+        pl.sub(camera_eye);
+        let rotationMatrix = new Matrix4();
+		rotationMatrix.setIdentity();
+		let d = rotationMatrix.multiplyVector3(pl);
+		camera_at = d.add(camera_eye);
+    }
+    if(y<g_prevY) {
+        var pl = new Vector3;
+        var nv = new Vector3([0,1,0]);
+        pl.set(camera_at);
+        pl.sub(nv);
+        pl.sub(camera_eye);
+        let rotationMatrix = new Matrix4();
+		rotationMatrix.setIdentity();
+		let d = rotationMatrix.multiplyVector3(pl);
+		camera_at = d.add(camera_eye);
+    }
+
+    g_prevX = x;
+    g_prevY = y;
+}
 
 document.onkeydown = (e) => {
 
@@ -580,6 +623,9 @@ document.onkeydown = (e) => {
         d.normalize()
 
         camera_eye.add(d)
+        if(camera_eye.elements[1] < 0.5) {
+            camera_eye.elements[1] = 0.5
+        }
         camera_at.add(d)
     }
     if (e.key == 's') {
@@ -590,6 +636,9 @@ document.onkeydown = (e) => {
         d.normalize()
 
         camera_eye.sub(d)
+        if(camera_eye.elements[1] < 0.5) {
+            camera_eye.elements[1] = 0.5
+        }
         camera_at.sub(d)
     }
     if (e.key == 'd') {
@@ -615,9 +664,6 @@ document.onkeydown = (e) => {
         d.sub(camera_eye)
         d.normalize()
 
-        // camera_eye.add(d)
-        // camera_at.add(d)
-
         var right = new Vector3() 
         right = Vector3.cross(d, camera_up)
 
@@ -630,10 +676,9 @@ document.onkeydown = (e) => {
         pl.sub(camera_eye);
         let rotationMatrix = new Matrix4();
 		rotationMatrix.setIdentity();
-		rotationMatrix.setRotate(1 * 1, camera_up.elements[0], camera_up.elements[1], camera_up.elements[2]);
-		// Get the vec3 translation of Matrix4 Rotation Matrix
-		let d3D = rotationMatrix.multiplyVector3(pl);
-		camera_at = d3D.add(camera_eye);
+		rotationMatrix.setRotate(1, camera_up.elements[0], camera_up.elements[1], camera_up.elements[2]);
+		let d = rotationMatrix.multiplyVector3(pl);
+		camera_at = d.add(camera_eye);
 
     }
     if (e.key == 'ArrowRight') {
@@ -642,10 +687,32 @@ document.onkeydown = (e) => {
         pl.sub(camera_eye);
         let rotationMatrix = new Matrix4();
 		rotationMatrix.setIdentity();
-		rotationMatrix.setRotate(-1 * 1, camera_up.elements[0], camera_up.elements[1], camera_up.elements[2]);
-		// Get the vec3 translation of Matrix4 Rotation Matrix
-		let d3D = rotationMatrix.multiplyVector3(pl);
-		camera_at = d3D.add(camera_eye);
+		rotationMatrix.setRotate(-1, camera_up.elements[0], camera_up.elements[1], camera_up.elements[2]);
+
+		let d = rotationMatrix.multiplyVector3(pl);
+		camera_at = d.add(camera_eye);
+
+    }
+    if (e.key == 'q') {
+        var pl = new Vector3;
+        pl.set(camera_at);
+        pl.sub(camera_eye);
+        let rotationMatrix = new Matrix4();
+		rotationMatrix.setIdentity();
+		rotationMatrix.setRotate(1, camera_up.elements[0], camera_up.elements[1], camera_up.elements[2]);
+		let d = rotationMatrix.multiplyVector3(pl);
+		camera_at = d.add(camera_eye);
+
+    }
+    if (e.key == 'e') {
+        var pl = new Vector3;
+        pl.set(camera_at);
+        pl.sub(camera_eye);
+        let rotationMatrix = new Matrix4();
+		rotationMatrix.setIdentity();
+		rotationMatrix.setRotate(-1, camera_up.elements[0], camera_up.elements[1], camera_up.elements[2]);
+		let d = rotationMatrix.multiplyVector3(pl);
+		camera_at = d.add(camera_eye);
 
     }
 
@@ -657,8 +724,8 @@ document.onkeydown = (e) => {
         pl.sub(camera_eye);
         let rotationMatrix = new Matrix4();
 		rotationMatrix.setIdentity();
-		let d3D = rotationMatrix.multiplyVector3(pl);
-		camera_at = d3D.add(camera_eye);
+		let d = rotationMatrix.multiplyVector3(pl);
+		camera_at = d.add(camera_eye);
     }
 
     if(e.key == 'ArrowDown') {
@@ -669,39 +736,55 @@ document.onkeydown = (e) => {
         pl.sub(camera_eye);
         let rotationMatrix = new Matrix4();
 		rotationMatrix.setIdentity();
-		let d3D = rotationMatrix.multiplyVector3(pl);
-		camera_at = d3D.add(camera_eye);
+		let d = rotationMatrix.multiplyVector3(pl);
+		camera_at = d.add(camera_eye);
     }
 }
 
 map = [
-    [0, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    [0, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
 ]
 
 draw_map = () => {
-    for(x=0;x<16;x++) {
-        for(y=0;y<16;y++) {
+    for(x=0;x<32;x++) {
+        for(y=0;y<32;y++) {
             if(map[x][y]) {
                 var block = new Cubes()
                 block.color = [1,1,1,1]
-                block.texture_num = 2;
-                block.matrix.scale(0.15,0.15,0.15)
-                block.matrix.translate(x-8, -4.75, y-8)
+                block.texture_num = 3;
+                block.matrix.scale(0.5,0.5,0.5)
+                block.matrix.translate(x-16, -1.75, y-16)
                 block.render()
             }
         }
@@ -760,7 +843,7 @@ render_scene = () => {
     }
     if (l % 10 == 0 && i < -0.21 && kill_time < max_kill_time) {
         // if (camera_change_x > -0.1) {
-            var viewMat = new Matrix4()
+            // var viewMat = new Matrix4()
             // viewMat.rotate(-camera_change_y * 100, 1, 0, 0);
             // viewMat.rotate(-camera_change_x * 50, 0, 1, 0);
             // camera_change_x -= 0.2
@@ -768,7 +851,7 @@ render_scene = () => {
             // var zoomMat = new Matrix4();
             // zoomMat.scale(g_zoom, g_zoom, g_zoom);
             // console.log(g_globalX, g_globalY)
-            gl.uniformMatrix4fv(u_global_rotation_matrix, false, viewMat.elements);
+            // gl.uniformMatrix4fv(u_global_rotation_matrix, false, viewMat.elements);
             // change_camera_angle = 0
         // }
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
@@ -816,7 +899,7 @@ render_scene = () => {
     }
     if (l % 10 == 0 && kill_time == max_kill_time && bomb_size < 2) {
         // if (camera_change_y < 1.15) {
-            var viewMat = new Matrix4()
+            // var viewMat = new Matrix4()
             // viewMat.rotate(-camera_change_y * 100, 1, 0, 0);
             // viewMat.rotate(-camera_change_x * 50, 0, 1, 0);
             // camera_change_x += 0.2
@@ -824,7 +907,7 @@ render_scene = () => {
             // var zoomMat = new Matrix4();
             // zoomMat.scale(g_zoom, g_zoom, g_zoom);
             // console.log(g_globalX, g_globalY)
-            gl.uniformMatrix4fv(u_global_rotation_matrix, false, viewMat.elements);
+            // gl.uniformMatrix4fv(u_global_rotation_matrix, false, viewMat.elements);
             // change_camera_angle = 2
         // }
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
@@ -853,7 +936,7 @@ render_scene = () => {
 
     if (bomb_size > 1.5 && bomb_size < 10.5) {
         // if (camera_change_y < 1.15) {
-            var viewMat = new Matrix4()
+            // var viewMat = new Matrix4()
             // viewMat.rotate(-camera_change_y * 100, 1, 0, 0);
             // viewMat.rotate(-camera_change_x * 50, 0, 1, 0);
             // camera_change_x += 0.2
@@ -861,7 +944,7 @@ render_scene = () => {
             // var zoomMat = new Matrix4();
             // zoomMat.scale(g_zoom, g_zoom, g_zoom);
             // console.log(g_globalX, g_globalY)
-            gl.uniformMatrix4fv(u_global_rotation_matrix, false, viewMat.elements);
+            // gl.uniformMatrix4fv(u_global_rotation_matrix, false, viewMat.elements);
             // change_camera_angle = 2
         // }
         gl.clearColor(206 / 255, 123 / 255, 119 / 255, 1);
@@ -875,7 +958,7 @@ render_scene = () => {
     // console.log(bomb_size)
     if (l % 10 == 0 && bomb_size > 10.4) {
         // if (change_camera_angle == 2) {
-            var viewMat = new Matrix4()
+            // var viewMat = new Matrix4()
             // viewMat.rotate(-0 * 100, 1, 0, 0);
             // viewMat.rotate(-1.15 * 50, 0, 1, 0);
             // camera_change_x += 0.2
@@ -883,7 +966,7 @@ render_scene = () => {
             // var zoomMat = new Matrix4();
             // zoomMat.scale(g_zoom, g_zoom, g_zoom);
             // console.log(g_globalX, g_globalY)
-            gl.uniformMatrix4fv(u_global_rotation_matrix, false, viewMat.elements);
+            // gl.uniformMatrix4fv(u_global_rotation_matrix, false, viewMat.elements);
             // change_camera_angle = 3
         // }
         gl.clearColor(0.5, 0.5, 0.5, 1);
