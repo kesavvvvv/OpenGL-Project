@@ -115,7 +115,7 @@ function initTextures(gl, n) {
     var image1 = new Image();
     var image2 = new Image();
     var image3 = new Image();
-    
+
     // Register the event handler to be called when image loading is completed
     image0.onload = function () { loadTexture(gl, n, texture0, u_Sampler0, image0, 0); };
     image1.onload = function () { loadTexture(gl, n, texture1, u_Sampler1, image1, 1); };
@@ -126,7 +126,7 @@ function initTextures(gl, n) {
     image1.src = 'resources/lava.png';
     image2.src = 'resources/quartz.png';
     image3.src = 'resources/magma.png';
-    
+
 
     return true;
 }
@@ -138,7 +138,7 @@ function loadTexture(gl, n, texture, u_Sampler, image, texUnit) {
     // Make the texture unit active
     if (texUnit == 0) {
         gl.activeTexture(gl.TEXTURE0);
-    } 
+    }
     else if (texUnit == 1) {
         gl.activeTexture(gl.TEXTURE1);
     }
@@ -148,7 +148,7 @@ function loadTexture(gl, n, texture, u_Sampler, image, texUnit) {
     else if (texUnit == 3) {
         gl.activeTexture(gl.TEXTURE3);
     }
-    
+
     // Bind the texture object to the target
     gl.bindTexture(gl.TEXTURE_2D, texture);
 
@@ -224,12 +224,12 @@ document.onmousemove = (e) => {
 
 
 var should_i_animate = 1
-document.getElementById("animate").onclick = () => {
-    if (should_i_animate)
-        should_i_animate = 0
-    else
-        should_i_animate = 1
-}
+// document.getElementById("animate").onclick = () => {
+//     if (should_i_animate)
+//         should_i_animate = 0
+//     else
+//         should_i_animate = 1
+// }
 
 setup_webgl = () => {
 
@@ -338,6 +338,11 @@ const tri_button = document.getElementById('triangle');
 const sq_button = document.getElementById('square');
 const cir_button = document.getElementById('circle');
 const draw_button = document.getElementById('draw');
+
+const add_button = document.getElementById('add');
+const remove_button = document.getElementById('remove');
+
+
 
 // Initialize all sliders
 const red_slider = document.getElementById('red');
@@ -565,53 +570,55 @@ function changeView(ev) {
 
     x = ((x - rect.left) - canvas.width / 2) / (canvas.width / 2);
     y = (canvas.height / 2 - (y - rect.top)) / (canvas.height / 2);
-    
-    if(x<g_prevX) {
+
+    if (x < g_prevX) {
         var pl = new Vector3;
         pl.set(camera_at);
         pl.sub(camera_eye);
         let rotationMatrix = new Matrix4();
-		rotationMatrix.setIdentity();
-		rotationMatrix.setRotate(1, camera_up.elements[0], camera_up.elements[1], camera_up.elements[2]);
-		let d = rotationMatrix.multiplyVector3(pl);
-		camera_at = d.add(camera_eye);
+        rotationMatrix.setIdentity();
+        rotationMatrix.setRotate(1, camera_up.elements[0], camera_up.elements[1], camera_up.elements[2]);
+        let d = rotationMatrix.multiplyVector3(pl);
+        camera_at = d.add(camera_eye);
     }
-    if(x>g_prevX) {
+    if (x > g_prevX) {
         var pl = new Vector3;
         pl.set(camera_at);
         pl.sub(camera_eye);
         let rotationMatrix = new Matrix4();
-		rotationMatrix.setIdentity();
-		rotationMatrix.setRotate(-1, camera_up.elements[0], camera_up.elements[1], camera_up.elements[2]);
-		let d = rotationMatrix.multiplyVector3(pl);
-		camera_at = d.add(camera_eye);
+        rotationMatrix.setIdentity();
+        rotationMatrix.setRotate(-1, camera_up.elements[0], camera_up.elements[1], camera_up.elements[2]);
+        let d = rotationMatrix.multiplyVector3(pl);
+        camera_at = d.add(camera_eye);
     }
-    if(y>g_prevY) {
+    if (y > g_prevY) {
         var pl = new Vector3;
-        var nv = new Vector3([0,1,0]);
+        var nv = new Vector3([0, 1, 0]);
         pl.set(camera_at);
         pl.add(nv);
         pl.sub(camera_eye);
         let rotationMatrix = new Matrix4();
-		rotationMatrix.setIdentity();
-		let d = rotationMatrix.multiplyVector3(pl);
-		camera_at = d.add(camera_eye);
+        rotationMatrix.setIdentity();
+        let d = rotationMatrix.multiplyVector3(pl);
+        camera_at = d.add(camera_eye);
     }
-    if(y<g_prevY) {
+    if (y < g_prevY) {
         var pl = new Vector3;
-        var nv = new Vector3([0,1,0]);
+        var nv = new Vector3([0, 1, 0]);
         pl.set(camera_at);
         pl.sub(nv);
         pl.sub(camera_eye);
         let rotationMatrix = new Matrix4();
-		rotationMatrix.setIdentity();
-		let d = rotationMatrix.multiplyVector3(pl);
-		camera_at = d.add(camera_eye);
+        rotationMatrix.setIdentity();
+        let d = rotationMatrix.multiplyVector3(pl);
+        camera_at = d.add(camera_eye);
     }
 
     g_prevX = x;
     g_prevY = y;
 }
+
+var f_is_pressed = 0
 
 document.onkeydown = (e) => {
 
@@ -623,7 +630,7 @@ document.onkeydown = (e) => {
         d.normalize()
 
         camera_eye.add(d)
-        if(camera_eye.elements[1] < 0.5) {
+        if (camera_eye.elements[1] < 0.5) {
             camera_eye.elements[1] = 0.5
         }
         camera_at.add(d)
@@ -636,7 +643,7 @@ document.onkeydown = (e) => {
         d.normalize()
 
         camera_eye.sub(d)
-        if(camera_eye.elements[1] < 0.5) {
+        if (camera_eye.elements[1] < 0.5) {
             camera_eye.elements[1] = 0.5
         }
         camera_at.sub(d)
@@ -651,7 +658,7 @@ document.onkeydown = (e) => {
         // camera_eye.add(d)
         // camera_at.add(d)
 
-        var left = new Vector3() 
+        var left = new Vector3()
         left = Vector3.cross(d, camera_up)
 
         camera_eye.add(left)
@@ -664,7 +671,7 @@ document.onkeydown = (e) => {
         d.sub(camera_eye)
         d.normalize()
 
-        var right = new Vector3() 
+        var right = new Vector3()
         right = Vector3.cross(d, camera_up)
 
         camera_eye.sub(right)
@@ -675,10 +682,10 @@ document.onkeydown = (e) => {
         pl.set(camera_at);
         pl.sub(camera_eye);
         let rotationMatrix = new Matrix4();
-		rotationMatrix.setIdentity();
-		rotationMatrix.setRotate(1, camera_up.elements[0], camera_up.elements[1], camera_up.elements[2]);
-		let d = rotationMatrix.multiplyVector3(pl);
-		camera_at = d.add(camera_eye);
+        rotationMatrix.setIdentity();
+        rotationMatrix.setRotate(1, camera_up.elements[0], camera_up.elements[1], camera_up.elements[2]);
+        let d = rotationMatrix.multiplyVector3(pl);
+        camera_at = d.add(camera_eye);
 
     }
     if (e.key == 'ArrowRight') {
@@ -686,11 +693,11 @@ document.onkeydown = (e) => {
         pl.set(camera_at);
         pl.sub(camera_eye);
         let rotationMatrix = new Matrix4();
-		rotationMatrix.setIdentity();
-		rotationMatrix.setRotate(-1, camera_up.elements[0], camera_up.elements[1], camera_up.elements[2]);
+        rotationMatrix.setIdentity();
+        rotationMatrix.setRotate(-1, camera_up.elements[0], camera_up.elements[1], camera_up.elements[2]);
 
-		let d = rotationMatrix.multiplyVector3(pl);
-		camera_at = d.add(camera_eye);
+        let d = rotationMatrix.multiplyVector3(pl);
+        camera_at = d.add(camera_eye);
 
     }
     if (e.key == 'q') {
@@ -698,10 +705,10 @@ document.onkeydown = (e) => {
         pl.set(camera_at);
         pl.sub(camera_eye);
         let rotationMatrix = new Matrix4();
-		rotationMatrix.setIdentity();
-		rotationMatrix.setRotate(1, camera_up.elements[0], camera_up.elements[1], camera_up.elements[2]);
-		let d = rotationMatrix.multiplyVector3(pl);
-		camera_at = d.add(camera_eye);
+        rotationMatrix.setIdentity();
+        rotationMatrix.setRotate(1, camera_up.elements[0], camera_up.elements[1], camera_up.elements[2]);
+        let d = rotationMatrix.multiplyVector3(pl);
+        camera_at = d.add(camera_eye);
 
     }
     if (e.key == 'e') {
@@ -709,35 +716,43 @@ document.onkeydown = (e) => {
         pl.set(camera_at);
         pl.sub(camera_eye);
         let rotationMatrix = new Matrix4();
-		rotationMatrix.setIdentity();
-		rotationMatrix.setRotate(-1, camera_up.elements[0], camera_up.elements[1], camera_up.elements[2]);
-		let d = rotationMatrix.multiplyVector3(pl);
-		camera_at = d.add(camera_eye);
+        rotationMatrix.setIdentity();
+        rotationMatrix.setRotate(-1, camera_up.elements[0], camera_up.elements[1], camera_up.elements[2]);
+        let d = rotationMatrix.multiplyVector3(pl);
+        camera_at = d.add(camera_eye);
 
     }
 
-    if(e.key == 'ArrowUp') {
+    if (e.key == 'ArrowUp') {
         var pl = new Vector3;
-        var nv = new Vector3([0,1,0]);
+        var nv = new Vector3([0, 1, 0]);
         pl.set(camera_at);
         pl.add(nv);
         pl.sub(camera_eye);
         let rotationMatrix = new Matrix4();
-		rotationMatrix.setIdentity();
-		let d = rotationMatrix.multiplyVector3(pl);
-		camera_at = d.add(camera_eye);
+        rotationMatrix.setIdentity();
+        let d = rotationMatrix.multiplyVector3(pl);
+        camera_at = d.add(camera_eye);
     }
 
-    if(e.key == 'ArrowDown') {
+    if (e.key == 'ArrowDown') {
         var pl = new Vector3;
-        var nv = new Vector3([0,1,0]);
+        var nv = new Vector3([0, 1, 0]);
         pl.set(camera_at);
         pl.sub(nv);
         pl.sub(camera_eye);
         let rotationMatrix = new Matrix4();
-		rotationMatrix.setIdentity();
-		let d = rotationMatrix.multiplyVector3(pl);
-		camera_at = d.add(camera_eye);
+        rotationMatrix.setIdentity();
+        let d = rotationMatrix.multiplyVector3(pl);
+        camera_at = d.add(camera_eye);
+    }
+
+    if(e.key == 'f') {
+        if(f_is_pressed == 0) {
+            f_is_pressed = 1
+        } else {
+            f_is_pressed = 0 
+        }
     }
 }
 
@@ -750,45 +765,67 @@ map = [
     [0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0],
+    [0, 1, 2, 1, 3, 1, 2, 0, 0, 1, 1, 3, 1, 1, 1, 0, 0, 2, 1, 1, 4, 1, 1, 0, 0, 3, 1, 1, 1, 1, 1, 0],
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0],
+    [0, 1, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0],
+    [0, 1, 1, 5, 1, 1, 1, 0, 0, 1, 3, 1, 4, 1, 1, 0, 0, 1, 2, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0],
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0],
+    [0, 1, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 2, 1, 1, 4, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 2, 1, 1, 1, 0, 0, 1, 2, 1, 1, 1, 1, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 2, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
 ]
 
+
+add_button.onclick = () => {
+    map[Math.floor(Math.random() * 32)][Math.floor(Math.random() * 32)] += 1
+}
+
+remove_button.onclick = () => {
+    x = Math.floor(Math.random() * 32)
+    y = Math.floor(Math.random() * 32)
+    while(map[x][y] == 0) {
+        x = Math.floor(Math.random() * 32)
+        y = Math.floor(Math.random() * 32)
+    }
+
+    map[x][y] -= 1;
+    
+}
+
 draw_map = () => {
-    for(x=0;x<32;x++) {
-        for(y=0;y<32;y++) {
-            if(map[x][y]) {
+    
+    for (x = 0; x < 32; x++) {
+        for (y = 0; y < 32; y++) {
+            for (height = 0; height < map[x][y]; height++) {
+                if(map[x][y]) {
                 var block = new Cubes()
-                block.color = [1,1,1,1]
+                block.color = [1, 1, 1, 1]
                 block.texture_num = 3;
-                block.matrix.scale(0.5,0.5,0.5)
-                block.matrix.translate(x-16, -1.75, y-16)
+                block.matrix.scale(0.5, 0.5, 0.5)
+                block.matrix.translate(x - 16, -1.75 + height, y - 16)
                 block.render()
             }
+            }
+
         }
     }
+    
 }
 
 render_scene = () => {
@@ -796,7 +833,7 @@ render_scene = () => {
     var kesav_time_start = performance.now() / 1000.0
 
     var proj_matrix = new Matrix4();
-    proj_matrix.setPerspective(50, canvas.width/canvas.height, 1, 100);
+    proj_matrix.setPerspective(50, canvas.width / canvas.height, 1, 100);
     gl.uniformMatrix4fv(u_projection_matrix, false, proj_matrix.elements);
     // Pass the view matrix
     var view_matrix = new Matrix4();
@@ -807,15 +844,13 @@ render_scene = () => {
 
     // gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
     // gl.clear(gl.COLOR_BUFFER_BIT)
-    
-    
 
     if (l % 10 == 0 && i > -0.21) {
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
         gl.clear(gl.COLOR_BUFFER_BIT)
-        
+
         var floor = new Cubes()
-        floor.color = [1,0,0,1]
+        floor.color = [1, 0, 0, 1]
         floor.texture_num = 0;
         floor.matrix.translate(0, -0.8, 0.0)
         floor.matrix.scale(50, 0, 50)
@@ -823,7 +858,7 @@ render_scene = () => {
         floor.render()
 
         var sky = new Cubes()
-        sky.color = [1,0,0,1]
+        sky.color = [1, 0, 0, 1]
         sky.texture_num = 1;
         sky.matrix.scale(50, 50, 50)
         sky.matrix.translate(-0.5, -0.5, -0.5)
@@ -843,30 +878,30 @@ render_scene = () => {
     }
     if (l % 10 == 0 && i < -0.21 && kill_time < max_kill_time) {
         // if (camera_change_x > -0.1) {
-            // var viewMat = new Matrix4()
-            // viewMat.rotate(-camera_change_y * 100, 1, 0, 0);
-            // viewMat.rotate(-camera_change_x * 50, 0, 1, 0);
-            // camera_change_x -= 0.2
-            // camera_change_y += 0.05
-            // var zoomMat = new Matrix4();
-            // zoomMat.scale(g_zoom, g_zoom, g_zoom);
-            // console.log(g_globalX, g_globalY)
-            // gl.uniformMatrix4fv(u_global_rotation_matrix, false, viewMat.elements);
-            // change_camera_angle = 0
+        // var viewMat = new Matrix4()
+        // viewMat.rotate(-camera_change_y * 100, 1, 0, 0);
+        // viewMat.rotate(-camera_change_x * 50, 0, 1, 0);
+        // camera_change_x -= 0.2
+        // camera_change_y += 0.05
+        // var zoomMat = new Matrix4();
+        // zoomMat.scale(g_zoom, g_zoom, g_zoom);
+        // console.log(g_globalX, g_globalY)
+        // gl.uniformMatrix4fv(u_global_rotation_matrix, false, viewMat.elements);
+        // change_camera_angle = 0
         // }
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
         gl.clear(gl.COLOR_BUFFER_BIT)
 
         var floor = new Cubes()
-        floor.color = [1,0,0,1]
+        floor.color = [1, 0, 0, 1]
         floor.texture_num = 0;
         floor.matrix.translate(0, -0.8, 0.0)
         floor.matrix.scale(50, 0, 50)
         floor.matrix.translate(-0.5, 0, -0.5)
         floor.render()
-        
+
         var sky = new Cubes()
-        sky.color = [1,0,0,1]
+        sky.color = [1, 0, 0, 1]
         sky.texture_num = 1;
         sky.matrix.scale(50, 50, 50)
         sky.matrix.translate(-0.5, -0.5, -0.5)
@@ -899,29 +934,29 @@ render_scene = () => {
     }
     if (l % 10 == 0 && kill_time == max_kill_time && bomb_size < 2) {
         // if (camera_change_y < 1.15) {
-            // var viewMat = new Matrix4()
-            // viewMat.rotate(-camera_change_y * 100, 1, 0, 0);
-            // viewMat.rotate(-camera_change_x * 50, 0, 1, 0);
-            // camera_change_x += 0.2
-            // camera_change_y -= 0.05
-            // var zoomMat = new Matrix4();
-            // zoomMat.scale(g_zoom, g_zoom, g_zoom);
-            // console.log(g_globalX, g_globalY)
-            // gl.uniformMatrix4fv(u_global_rotation_matrix, false, viewMat.elements);
-            // change_camera_angle = 2
+        // var viewMat = new Matrix4()
+        // viewMat.rotate(-camera_change_y * 100, 1, 0, 0);
+        // viewMat.rotate(-camera_change_x * 50, 0, 1, 0);
+        // camera_change_x += 0.2
+        // camera_change_y -= 0.05
+        // var zoomMat = new Matrix4();
+        // zoomMat.scale(g_zoom, g_zoom, g_zoom);
+        // console.log(g_globalX, g_globalY)
+        // gl.uniformMatrix4fv(u_global_rotation_matrix, false, viewMat.elements);
+        // change_camera_angle = 2
         // }
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
         gl.clear(gl.COLOR_BUFFER_BIT)
         var floor = new Cubes()
-    floor.color = [1,0,0,1]
-    floor.texture_num = 0;
-    floor.matrix.translate(0, -0.8, 0.0)
-    floor.matrix.scale(50, 0, 50)
-    floor.matrix.translate(-0.5, 0, -0.5)
-    floor.render()
+        floor.color = [1, 0, 0, 1]
+        floor.texture_num = 0;
+        floor.matrix.translate(0, -0.8, 0.0)
+        floor.matrix.scale(50, 0, 50)
+        floor.matrix.translate(-0.5, 0, -0.5)
+        floor.render()
 
-    var sky = new Cubes()
-        sky.color = [1,0,0,1]
+        var sky = new Cubes()
+        sky.color = [1, 0, 0, 1]
         sky.texture_num = 1;
         sky.matrix.scale(50, 50, 50)
         sky.matrix.translate(-0.5, -0.5, -0.5)
@@ -936,16 +971,16 @@ render_scene = () => {
 
     if (bomb_size > 1.5 && bomb_size < 10.5) {
         // if (camera_change_y < 1.15) {
-            // var viewMat = new Matrix4()
-            // viewMat.rotate(-camera_change_y * 100, 1, 0, 0);
-            // viewMat.rotate(-camera_change_x * 50, 0, 1, 0);
-            // camera_change_x += 0.2
-            // camera_change_y -= 0.05
-            // var zoomMat = new Matrix4();
-            // zoomMat.scale(g_zoom, g_zoom, g_zoom);
-            // console.log(g_globalX, g_globalY)
-            // gl.uniformMatrix4fv(u_global_rotation_matrix, false, viewMat.elements);
-            // change_camera_angle = 2
+        // var viewMat = new Matrix4()
+        // viewMat.rotate(-camera_change_y * 100, 1, 0, 0);
+        // viewMat.rotate(-camera_change_x * 50, 0, 1, 0);
+        // camera_change_x += 0.2
+        // camera_change_y -= 0.05
+        // var zoomMat = new Matrix4();
+        // zoomMat.scale(g_zoom, g_zoom, g_zoom);
+        // console.log(g_globalX, g_globalY)
+        // gl.uniformMatrix4fv(u_global_rotation_matrix, false, viewMat.elements);
+        // change_camera_angle = 2
         // }
         gl.clearColor(206 / 255, 123 / 255, 119 / 255, 1);
 
@@ -958,16 +993,16 @@ render_scene = () => {
     // console.log(bomb_size)
     if (l % 10 == 0 && bomb_size > 10.4) {
         // if (change_camera_angle == 2) {
-            // var viewMat = new Matrix4()
-            // viewMat.rotate(-0 * 100, 1, 0, 0);
-            // viewMat.rotate(-1.15 * 50, 0, 1, 0);
-            // camera_change_x += 0.2
-            // camera_change_y -= 0.05
-            // var zoomMat = new Matrix4();
-            // zoomMat.scale(g_zoom, g_zoom, g_zoom);
-            // console.log(g_globalX, g_globalY)
-            // gl.uniformMatrix4fv(u_global_rotation_matrix, false, viewMat.elements);
-            // change_camera_angle = 3
+        // var viewMat = new Matrix4()
+        // viewMat.rotate(-0 * 100, 1, 0, 0);
+        // viewMat.rotate(-1.15 * 50, 0, 1, 0);
+        // camera_change_x += 0.2
+        // camera_change_y -= 0.05
+        // var zoomMat = new Matrix4();
+        // zoomMat.scale(g_zoom, g_zoom, g_zoom);
+        // console.log(g_globalX, g_globalY)
+        // gl.uniformMatrix4fv(u_global_rotation_matrix, false, viewMat.elements);
+        // change_camera_angle = 3
         // }
         gl.clearColor(0.5, 0.5, 0.5, 1);
 
@@ -977,45 +1012,45 @@ render_scene = () => {
         // console.log(is_shift_down)
         if (is_shift_down) {
             gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
-        gl.clear(gl.COLOR_BUFFER_BIT)
-        var floor = new Cubes()
-    floor.color = [1,0,0,1]
-    floor.texture_num = 0;
-    floor.matrix.translate(0, -0.8, 0.0)
-    floor.matrix.scale(50, 0, 50)
-    floor.matrix.translate(-0.5, 0, -0.5)
-    floor.render()
+            gl.clear(gl.COLOR_BUFFER_BIT)
+            var floor = new Cubes()
+            floor.color = [1, 0, 0, 1]
+            floor.texture_num = 0;
+            floor.matrix.translate(0, -0.8, 0.0)
+            floor.matrix.scale(50, 0, 50)
+            floor.matrix.translate(-0.5, 0, -0.5)
+            floor.render()
 
-    var sky = new Cubes()
-        sky.color = [1,0,0,1]
-        sky.texture_num = 1;
-        sky.matrix.scale(50, 50, 50)
-        sky.matrix.translate(-0.5, -0.5, -0.5)
-        sky.render()
+            var sky = new Cubes()
+            sky.color = [1, 0, 0, 1]
+            sky.texture_num = 1;
+            sky.matrix.scale(50, 50, 50)
+            sky.matrix.translate(-0.5, -0.5, -0.5)
+            sky.render()
 
-        draw_map()
+            draw_map()
 
             animate_steve_pork_chop_no_jump()
         }
         else {
             gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
-        gl.clear(gl.COLOR_BUFFER_BIT)
-        var floor = new Cubes()
-    floor.color = [1,0,0,1]
-    floor.texture_num = 0;
-    floor.matrix.translate(0, -0.8, 0.0)
-    floor.matrix.scale(50, 0, 50)
-    floor.matrix.translate(-0.5, 0, -0.5)
-    floor.render()
+            gl.clear(gl.COLOR_BUFFER_BIT)
+            var floor = new Cubes()
+            floor.color = [1, 0, 0, 1]
+            floor.texture_num = 0;
+            floor.matrix.translate(0, -0.8, 0.0)
+            floor.matrix.scale(50, 0, 50)
+            floor.matrix.translate(-0.5, 0, -0.5)
+            floor.render()
 
-    var sky = new Cubes()
-        sky.color = [1,0,0,1]
-        sky.texture_num = 1;
-        sky.matrix.scale(50, 50, 50)
-        sky.matrix.translate(-0.5, -0.5, -0.5)
-        sky.render()
+            var sky = new Cubes()
+            sky.color = [1, 0, 0, 1]
+            sky.texture_num = 1;
+            sky.matrix.scale(50, 50, 50)
+            sky.matrix.translate(-0.5, -0.5, -0.5)
+            sky.render()
 
-        draw_map()
+            draw_map()
 
             animate_steve_pork_chop()
         }
@@ -2576,7 +2611,7 @@ function main() {
     canvas.onmousedown = function (ev) { startView(ev) }
     canvas.onmousemove = function (ev) { if (ev.buttons == 1) { changeView(ev) } };
 
-    
+
 
     requestAnimationFrame(tick)
 }
