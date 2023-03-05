@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8" />
-    <title>Assignment 3 keravich</title>
+    <title>Assignment 4 keravich</title>
      <style>
         .test {
             width: 100%;
@@ -84,14 +84,14 @@
             right: 0;
             /* bottom: 0;  */
             width: 100%;
-            height: 97.5%;
+            height: 96%;
         }
     </style>
 </head>
 
 <body onload="main()">
     
-    <canvas id="example" width="400" height="400">
+    <canvas id="example" width="1920" height="1080">
         Please use a browser that supports "canvas"
     </canvas>
     
@@ -103,10 +103,26 @@
         <!-- <input type='button' id='animate' value='Animation' name='animate' required> -->
         <input type='button' id='add' value='Add Block' name='animate' required>
         <input type='button' id='remove' value='Remove Block' name='animate' required>
+        <input type='button' id='light_on' value='Light On' name='animate' required>
+        <input type='button' id='light_off' value='Light Off' name='animate' required>
+
         <!-- <input type='button' id='square' value='Square' name='sq' required>
         <input type='button' id='circle' value='Circle' name='cir' required>
         <input type='button' id='draw' value='Drawing' name='draw' required> -->
+        X
+        <input type="range" min="-180" max="180" value="0" class="slider" id="light_x">
+        Y
+        <input type="range" min="-180" max="180" value="0" class="slider" id="light_y">
+        Z
+        <input type="range" min="-180" max="180" value="0" class="slider" id="light_z">
+        R
+        <input type="range" min="0" max="255" value="255" class="slider" id="light_color_red">
+        G
+        <input type="range" min="0" max="255" value="255" class="slider" id="light_color_green">
+        B
+        <input type="range" min="0" max="255" value="255" class="slider" id="light_color_blue">
         FPS: <label id = "fps"></label>
+        
     </div>
     <!-- <div class="test1">
         <p>Red</p>
@@ -128,7 +144,8 @@
     <script src="lib/webgl-debug.js"></script>
     <script src="lib/webgl-utils.js"></script>
     <script src="cubes.js"></script>
-    <script src="asgn3.js"></script>
+    <script src="sphere.js"></script>
+    <script src="asgn4.js"></script>
 </body>
 
 </html>
