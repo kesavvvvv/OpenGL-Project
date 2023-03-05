@@ -1,7 +1,7 @@
 class Cubes {
     constructor() {
         this.matrix = new Matrix4()
-        this.texture_num = 10;
+        this.texture_num = -2;
     }
 
     draw_cube_3d_uv = (rgba) => {

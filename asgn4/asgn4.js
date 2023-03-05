@@ -37,39 +37,45 @@ var FSHADER_SOURCE = `
     uniform sampler2D u_Sampler3;
     uniform int u_which_texture;
     uniform bool u_is_light_on;
+    uniform bool u_is_normal_on;
 
     void main() {
 
-        if (u_which_texture == 10) {
+        if (u_is_normal_on) {
             gl_FragColor = vec4((v_normal+1.0)/2.0, 1.0);
-            // gl_FragColor = vec4(0,0,1,1);
         }
-        else if (u_which_texture == -2) {
-            gl_FragColor = u_FragColor;
-        } 
-        else if (u_which_texture == -1) {
-            gl_FragColor = vec4(v_UV, 1.0, 1.0);
-        } 
-        else if (u_which_texture == 0) {
-            vec4 color0 = texture2D(u_Sampler0, v_UV);
-            gl_FragColor = color0;
-        } 
-        else if (u_which_texture == 1) {
-            vec4 color1 = texture2D(u_Sampler1, v_UV);
-            gl_FragColor = color1;
-        } 
-        else if (u_which_texture == 2) {
-            vec4 color2 = texture2D(u_Sampler2, v_UV);
-            gl_FragColor = color2;
-        } 
-        else if (u_which_texture == 3) {
-            vec4 color3 = texture2D(u_Sampler3, v_UV);
-            gl_FragColor = color3;
-        } 
         else {
-            gl_FragColor = vec4(1, 0.5, 0.5, 1);
-            // gl_FragColor = vec4((v_normal+1.0)/2.0, 1.0);
+            if (u_which_texture == 10) {
+                gl_FragColor = vec4((v_normal+1.0)/2.0, 1.0);
+                // gl_FragColor = vec4(0,0,1,1);
+            }
+            else if (u_which_texture == -2) {
+                gl_FragColor = u_FragColor;
+            } 
+            else if (u_which_texture == -1) {
+                gl_FragColor = vec4(v_UV, 1.0, 1.0);
+            } 
+            else if (u_which_texture == 0) {
+                vec4 color0 = texture2D(u_Sampler0, v_UV);
+                gl_FragColor = color0;
+            } 
+            else if (u_which_texture == 1) {
+                vec4 color1 = texture2D(u_Sampler1, v_UV);
+                gl_FragColor = color1;
+            } 
+            else if (u_which_texture == 2) {
+                vec4 color2 = texture2D(u_Sampler2, v_UV);
+                gl_FragColor = color2;
+            } 
+            else if (u_which_texture == 3) {
+                vec4 color3 = texture2D(u_Sampler3, v_UV);
+                gl_FragColor = color3;
+            } 
+            else {
+                gl_FragColor = vec4(1, 0.5, 0.5, 1);
+                // gl_FragColor = vec4((v_normal+1.0)/2.0, 1.0);
 
+            }
         }
 
         vec3 light_vector = u_light_position - vec3(v_vertex_position);
@@ -418,6 +424,12 @@ connect_var_to_GLSL = () => {
         console.log('Failed to get the storage location of u_light_color')
         return
     }
+
+    u_is_normal_on = gl.getUniformLocation(gl.program, 'u_is_normal_on')
+    if (u_is_normal_on < 0) {
+        console.log('Failed to get the storage location of u_is_normal_on')
+        return
+    }
 }
 
 // Initialize all points
@@ -432,6 +444,12 @@ const remove_button = document.getElementById('remove');
 
 const light_on_button = document.getElementById('light_on');
 const light_off_button = document.getElementById('light_off');
+
+const normal_on_button = document.getElementById('normal_on');
+const normal_off_button = document.getElementById('normal_off');
+
+const animation_on_button = document.getElementById('animation_on');
+const animation_off_button = document.getElementById('animation_off');
 
 // Initialize all sliders
 const red_slider = document.getElementById('red');
@@ -470,11 +488,29 @@ function toRadians(deg) {
 var is_light_on = true;
 light_on_button.onclick = () => {
     is_light_on = true
-} 
+}
 
 light_off_button.onclick = () => {
     is_light_on = false
-} 
+}
+
+var is_normal_on = false;
+normal_on_button.onclick = () => {
+    is_normal_on = true
+}
+
+normal_off_button.onclick = () => {
+    is_normal_on = false
+}
+
+var is_animation_on = true;
+animation_on_button.onclick = () => {
+    is_animation_on = true
+}
+
+animation_off_button.onclick = () => {
+    is_animation_on = false
+}
 
 
 // Add logic to clear the canvas when clear button is pressed
@@ -703,7 +739,7 @@ tick = () => {
     }
 
 
-    
+
     requestAnimationFrame(tick)
 }
 
@@ -923,11 +959,11 @@ document.onkeydown = (e) => {
         camera_at = d.add(camera_eye);
     }
 
-    if(e.key == 'f') {
-        if(f_is_pressed == 0) {
+    if (e.key == 'f') {
+        if (f_is_pressed == 0) {
             f_is_pressed = 1
         } else {
-            f_is_pressed = 0 
+            f_is_pressed = 0
         }
     }
 }
@@ -975,33 +1011,33 @@ add_button.onclick = () => {
 remove_button.onclick = () => {
     x = Math.floor(Math.random() * 32)
     y = Math.floor(Math.random() * 32)
-    while(map[x][y] == 0) {
+    while (map[x][y] == 0) {
         x = Math.floor(Math.random() * 32)
         y = Math.floor(Math.random() * 32)
     }
 
     map[x][y] -= 1;
-    
+
 }
 
 draw_map = () => {
-    
+
     for (x = 0; x < 32; x++) {
         for (y = 0; y < 32; y++) {
             for (height = 0; height < map[x][y]; height++) {
-                if(map[x][y]) {
-                var block = new Cubes()
-                block.color = [1, 1, 1, 1]
-                block.texture_num = 3;
-                block.matrix.scale(0.5, 0.5, 0.5)
-                block.matrix.translate(x - 16, -1.75 + height, y - 16)
-                block.render()
-            }
+                if (map[x][y]) {
+                    var block = new Cubes()
+                    block.color = [1, 1, 1, 1]
+                    block.texture_num = 3;
+                    block.matrix.scale(0.5, 0.5, 0.5)
+                    block.matrix.translate(x - 16, -1.75 + height, y - 16)
+                    block.render()
+                }
             }
 
         }
     }
-    
+
 }
 render_for_asgn4 = () => {
     var proj_matrix = new Matrix4();
@@ -1361,14 +1397,23 @@ render_scene = () => {
     // var kesav_time_end = (performance.now() / 1000.0);
 
     var kesav_time_end = (performance.now() / 1000.0) - kesav_time_start;
-    light_pos[0] = Math.cos(kesav_time_start)
+    if (is_animation_on) {
+        light_pos[0] = Math.cos(kesav_time_start / 2) * 20
+    }
+    else {
+        light_pos[0] = light_x_slider.value  
+        light_pos[1] = light_y_slider.value
+        light_pos[2] = light_z_slider.value
+    }
+
     light_color[0] = light_color_red.value / 255
     light_color[1] = light_color_green.value / 255
     light_color[2] = light_color_blue.value / 255
-    
+
     gl.uniform3f(u_light_position, light_pos[0], light_pos[1], light_pos[2])
     gl.uniform3f(u_camera_position, camera_eye.elements[0], camera_eye.elements[1], camera_eye.elements[2])
     gl.uniform1i(u_is_light_on, is_light_on)
+    gl.uniform1i(u_is_normal_on, is_normal_on)
     gl.uniform3f(u_light_color, light_color[0], light_color[1], light_color[2])
     // var lastTime = new Date().getTime();
     // console.log(lastTime, now)

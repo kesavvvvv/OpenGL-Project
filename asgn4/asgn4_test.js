@@ -28,8 +28,13 @@ var FSHADER_SOURCE = `
     uniform sampler2D u_Sampler2;
     uniform sampler2D u_Sampler3;
     uniform int u_which_texture;
+    uniform bool u_is_normal_on;
     void main() {
 
+        if (u_is_normal_on) {
+            gl_FragColor = vec4((v_normal+1.0)/2.0, 1.0);
+        }
+        else {
         // if (u_which_texture == -4) {
         //     gl_FragColor = v_normal
         // }
@@ -61,6 +66,7 @@ var FSHADER_SOURCE = `
         else {
             gl_FragColor = vec4(1, 0.2, 0.2, 1);
         }
+    }
 
         
     }`; 
